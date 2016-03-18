@@ -23,10 +23,10 @@ public class SimpleThreadpool {
     private List<SimpleThreadpoolThread> threads;
 
     /**
-     * Thrown when there's a RuntimeException or InterruptedException when executing a runnable from the queue
+     * Thrown when there's a RuntimeException or InterruptedException when executing a runnable from the queue, or awaiting termination
      */
-    private class ExecutionException extends RuntimeException {
-        public ExecutionException(Throwable cause) {
+    private class ThreadpoolException extends RuntimeException {
+        public ThreadpoolException(Throwable cause) {
             super(cause);
         }
     }
@@ -58,7 +58,7 @@ public class SimpleThreadpool {
                     Thread.sleep(1);
                 }
             } catch (RuntimeException | InterruptedException e) {
-                throw new ExecutionException(e);
+                throw new ThreadpoolException(e);
             }
         }
     }
@@ -136,10 +136,14 @@ public class SimpleThreadpool {
             if (flag) {
                 return;
             }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new ThreadpoolException(e);
+            }
         }
         throw new TimeoutException("Unable to terminate threadpool within the specified timeout (" + timeout + "ms)");
     }
-
 
     /**
      * Awaits the termination of the threads in the threadpool indefinitely
