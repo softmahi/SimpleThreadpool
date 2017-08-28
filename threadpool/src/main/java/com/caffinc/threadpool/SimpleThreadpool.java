@@ -165,6 +165,11 @@ public class SimpleThreadpool {
             if (flag) {
                 return;
             }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new ThreadpoolException(e);
+            }
         }
     }
 
